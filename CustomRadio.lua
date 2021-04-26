@@ -367,7 +367,7 @@ local function handleMenu(...)
         elseif (usingMode == 'Fake message') then
             mode_FakeMessage()
         elseif (usingMode == 'Custom radio') then
-            thenmode_CustomRadio()
+            mode_CustomRadio()
         elseif (usingMode == 'Misc stuff') then
             mode_Misc()
         elseif (usingMode == '-') then
