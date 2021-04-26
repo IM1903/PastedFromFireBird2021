@@ -12,7 +12,7 @@ local enabled
 
 local useIt = ui.new_checkbox('lua', 'B', 'Fake radio/ message/ unbox meme')
 local fRadioModeSelector =
-    ui.new_combobox('lua', 'B', 'What you wanna do?', '-', 'Fake message', 'Fake unbox', 'Custom radio')
+    ui.new_combobox('lua', 'B', 'What you wanna do?', '-', 'Fake message', 'Fake unbox', 'Fake ban', 'Custom radio')
 local rRadioSelector =
     ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheers!', 'Sorry!', 'Thanks!', 'Negative.', 'Custom')
 local rCustomRadioLabel = ui.new_label('lua', 'B', 'Custom radio')
@@ -81,6 +81,46 @@ local proceedButton =
                 fakeRadioHeader,
                 realRadioContent .. ' ' .. fakeRadioUser .. '' .. itemType .. itemGrade .. itemName .. '"'
             )
+        elseif (usingMode == 'Fake ban') then
+            realRadioContent = ui.get(rRadioSelector)
+            fakeRadioUser = ui.get(fRadioUsrSelector)
+            itemType = ui.get(itemTypeSelector)
+            itemName = ui.get(itemNameInput)
+
+            if (fakeRadioUser == 'Self') then
+                localPlayer = entity.get_local_player()
+                local localName = entity.get_player_name(localPlayer)
+                fakeRadioUser = localName
+            else
+                fakeRadioUser = fakeRadioUser
+            end
+
+            if (itemType == 'Cooldown30Min') then
+                client.exec(
+                    fakeRadioHeader,
+                    realRadioContent ..
+                        ' ' .. '' .. fakeRadioUser .. ' abandoned the match and received a 30 minutes cooldown.'
+                )
+            elseif (itemType == 'Cooldown24Hrs') then
+                client.exec(
+                    fakeRadioHeader,
+                    realRadioContent ..
+                        ' ' .. '' .. fakeRadioUser .. ' abandoned the match and received a 24 hours cooldown.'
+                )
+            elseif (itemType == 'Cooldown7Day') then
+                client.exec(
+                    fakeRadioHeader,
+                    realRadioContent ..
+                        ' ' .. '' .. fakeRadioUser .. ' abandoned the match and received a 7 days cooldown.'
+                )
+            elseif (itemType == 'VACban') then
+                client.exec(
+                    fakeRadioHeader,
+                    realRadioContent ..
+                        ' ' ..
+                            '' .. fakeRadioUser .. ' has been permanently banned from official CS:GO servers.' .. '"'
+                )
+            end
         elseif (usingMode == 'Fake message') then
             fakeRadioMode = ui.get(fRadioModeSelector)
             realRadioContent = ui.get(rRadioSelector)
@@ -148,6 +188,8 @@ local function updateNameList()
             fRadioUsrSelector = ui.new_combobox('lua', 'B', 'Who will *say* this?', 'Self', unpack(names))
         elseif (ui.get(fRadioModeSelector) == 'Fake unbox') then
             fRadioUsrSelector = ui.new_combobox('lua', 'B', 'Who will have this?', 'Self', unpack(names))
+        elseif (ui.get(fRadioModeSelector) == 'Fake ban') then
+            fRadioUsrSelector = ui.new_combobox('lua', 'B', 'Who get "banned"?', 'Self', unpack(names))
         end
         old_size = #names
         enabled = ui.get(useIt)
@@ -186,6 +228,18 @@ local function refreshUI()
     ui.set_visible(itemNameInput, false)
     ui.set_visible(refreshNameList, false)
     ui.set_visible(proceedButton, false)
+end
+
+local function mode_FakeBan()
+    refreshUI()
+    ui.set_visible(fRadioModeSelector, true)
+    rRadioSelector =
+        ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheers!', 'Sorry!', 'Thanks!', 'Negative.', 'Roger.')
+    fRadioUsrSelector = ui.new_combobox('lua', 'B', 'Who get "banned"?', 'Self', unpack(names))
+    itemTypeSelector =
+        ui.new_combobox('lua', 'B', 'Ban type', 'Cooldown30Min', 'Cooldown24Hrs', 'Cooldown7Day', 'VACban')
+    ui.set_visible(refreshNameList, true)
+    ui.set_visible(proceedButton, true)
 end
 
 local function mode_FakeUnbox()
@@ -258,6 +312,8 @@ local function handleMenu(...)
         ui.set_visible(fRadioModeSelector, enabled)
         if (usingMode == 'Fake unbox') then
             mode_FakeUnbox()
+        elseif (usingMode == 'Fake ban') then
+            mode_FakeBan()
         elseif (usingMode == 'Fake message') then
             mode_FakeMessage()
         elseif (usingMode == 'Custom radio') then
