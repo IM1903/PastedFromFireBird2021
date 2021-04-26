@@ -109,25 +109,25 @@ local proceedButton =
                 client.exec(
                     fakeRadioHeader,
                     realRadioContent ..
-                        ' ' .. '' .. fakeRadioUser .. ' abandoned the match and received a 30 minutes cooldown.'
+                        ' ' .. '' .. fakeRadioUser .. ' abandoned the match and received a 30 minutes cooldown.'
                 )
             elseif (itemType == 'Cooldown24Hrs') then
                 client.exec(
                     fakeRadioHeader,
                     realRadioContent ..
-                        ' ' .. '' .. fakeRadioUser .. ' abandoned the match and received a 24 hours cooldown.'
+                        ' ' .. '' .. fakeRadioUser .. ' abandoned the match and received a 24 hours cooldown.'
                 )
             elseif (itemType == 'Cooldown7Day') then
                 client.exec(
                     fakeRadioHeader,
                     realRadioContent ..
-                        ' ' .. '' .. fakeRadioUser .. ' abandoned the match and received a 7 days cooldown.'
+                        ' ' .. '' .. fakeRadioUser .. ' abandoned the match and received a 7 days cooldown.'
                 )
             elseif (itemType == 'VACban') then
                 client.exec(
                     fakeRadioHeader,
                     realRadioContent ..
-                        ' ' ..
+                        ' ' ..
                             '' .. fakeRadioUser .. ' has been permanently banned from official CS:GO servers.' .. '"'
                 )
             end
