@@ -12,7 +12,17 @@ local enabled
 
 local useIt = ui.new_checkbox('lua', 'B', 'Fake radio/ message/ unbox meme')
 local fRadioModeSelector =
-    ui.new_combobox('lua', 'B', 'What you wanna do?', '-', 'Fake message', 'Fake unbox', 'Fake ban', 'Custom radio')
+    ui.new_combobox(
+    'lua',
+    'B',
+    'What you wanna do?',
+    '-',
+    'Fake message',
+    'Fake unbox',
+    'Fake ban',
+    'Custom radio',
+    'Misc stuff'
+)
 local rRadioSelector =
     ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheers!', 'Sorry!', 'Thanks!', 'Negative.', 'Custom')
 local rCustomRadioLabel = ui.new_label('lua', 'B', 'Custom radio')
@@ -180,6 +190,21 @@ local proceedButton =
             end
             itemName = ui.get(itemNameInput)
             client.exec(fakeRadioHeader, msgColor .. itemName .. '"')
+        elseif (usingMode == 'Misc stuff') then
+            realRadioContent = ui.get(rRadioSelector)
+            itemGrade = ui.get(itemGradeSelector)
+            if (itemGrade == 'Fake commend') then
+                client.exec(
+                    fakeRadioHeader,
+                    realRadioContent .. ' ' .. 'Congratulations! You have received a commendation."'
+                )
+            end
+            if (itemGrade == 'gamesense') then
+                client.exec(
+                    fakeRadioHeader,
+                    realRadioContent .. '  ' .. '     Powered by ' .. '' .. 'game' .. '' .. 'sense' .. '     "'
+                )
+            end
         end
     end
 )
@@ -321,6 +346,15 @@ local function mode_CustomRadio()
     ui.set_visible(proceedButton, enabled)
 end
 
+local function mode_Misc()
+    refreshUI()
+    ui.set_visible(fRadioModeSelector, true)
+    rRadioSelector =
+        ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheers!', 'Sorry!', 'Thanks!', 'Negative.', 'Roger.')
+    itemGradeSelector = ui.new_combobox('lua', 'B', 'Misc function', 'Fake commend', 'gamesense')
+    ui.set_visible(proceedButton, true)
+end
+
 local function handleMenu(...)
     enabled = ui.get(useIt)
     usingMode = ui.get(fRadioModeSelector)
@@ -333,7 +367,9 @@ local function handleMenu(...)
         elseif (usingMode == 'Fake message') then
             mode_FakeMessage()
         elseif (usingMode == 'Custom radio') then
-            mode_CustomRadio()
+            thenmode_CustomRadio()
+        elseif (usingMode == 'Misc stuff') then
+            mode_Misc()
         elseif (usingMode == '-') then
             refreshUI()
             ui.set_visible(fRadioModeSelector, true)
