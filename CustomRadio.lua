@@ -130,9 +130,25 @@ local proceedButton =
             if (fakeRadioUser == 'Self') then
                 localPlayer = entity.get_local_player()
                 local localName = entity.get_player_name(localPlayer)
-                fakeRadioUser = localName
+                if entity.is_alive(localPlayer) then
+                    fakeRadioUser = localName
+                else
+                    fakeRadioUser = '*DEAD* ' .. localName
+                end
             else
                 fakeRadioUser = fakeRadioUser
+                for i = globals.maxplayers(), 1, -1 do
+                    i = math.floor(i)
+                    local name = entity.get_player_name(i)
+                    if (name ~= 'unknown' and i ~= localPlayer) then
+                        if (fakeRadioUser == name and entity.is_alive(i)) then
+                            fakeRadioUser = fakeRadioUser
+                        end
+                        if (fakeRadioUser == name and not entity.is_alive(i)) then
+                            fakeRadioUser = '*DEAD* ' .. fakeRadioUser
+                        end
+                    end
+                end
             end
             client.exec(fakeRadioHeader, realRadioContent .. ' ' .. fakeRadioUser .. ' : ' .. itemName .. '"')
         elseif (usingMode == 'Custom radio') then
