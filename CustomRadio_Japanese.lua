@@ -186,7 +186,7 @@ local proceedButton =
             realRadioContent = ui.get(rRadioSelector)
             itemGrade = ui.get(itemGradeSelector)
             if (itemGrade == 'Fake commend') then
-                client.exec(fakeRadioHeader, realRadioContent .. ' ' .. ' おめでとう! あなたは称賛受け取りました。"')
+                client.exec(fakeRadioHeader, realRadioContent .. ' ' .. 'おめでとう! あなたは称賛受け取りました。"')
             end
             if (itemGrade == 'gamesense') then
                 client.exec(

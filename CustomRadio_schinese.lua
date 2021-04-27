@@ -185,7 +185,7 @@ local proceedButton =
             realRadioContent = ui.get(rRadioSelector)
             itemGrade = ui.get(itemGradeSelector)
             if (itemGrade == 'Fake commend') then
-                client.exec(fakeRadioHeader, realRadioContent .. ' ' .. ' 恭喜！您已收到一个称赞。"')
+                client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '恭喜！您已收到一个称赞。"')
             end
             if (itemGrade == 'gamesense') then
                 client.exec(
@@ -313,8 +313,8 @@ local function mode_FakeMessage()
     ui.set_visible(fRadioModeSelector, true)
     rRadioSelector = ui.new_combobox('lua', 'B', 'Radio used to disguise', '欢呼', '抱歉', '谢了', '否.', '确定')
     ui.set_visible(fRadioUsrSelector, true)
-    ui.set_visible(customMsgLabel, true)
-    ui.set_visible(itemNameInput, true)
+    customMsgLabel = ui.new_label('lua', 'B', 'Message content')
+    itemNameInput = ui.new_textbox('lua', 'B', 'Message content')
     ui.set_visible(refreshNameList, true)
     ui.set_visible(proceedButton, true)
 end
