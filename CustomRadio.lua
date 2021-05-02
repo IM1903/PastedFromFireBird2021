@@ -24,7 +24,7 @@ local fRadioModeSelector =
     'Misc stuff'
 )
 local rRadioSelector =
-    ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheers!', 'Sorry!', 'Thanks!', 'Negative.', 'Custom')
+    ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheer!', 'Sorry!', 'Thanks!', 'Negative.', 'Roger that.')
 local rCustomRadioLabel = ui.new_label('lua', 'B', 'Custom radio')
 local rCustomRadioInput = ui.new_textbox('lua', 'B', 'Custom radio content')
 local fRadioUsrSelector = ui.new_combobox('lua', 'B', 'Who will *say* this?', 'Self', unpack(names))
@@ -275,7 +275,7 @@ local function mode_FakeBan()
     refreshUI()
     ui.set_visible(fRadioModeSelector, true)
     rRadioSelector =
-        ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheers!', 'Sorry!', 'Thanks!', 'Negative.', 'Roger.')
+        ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheer!', 'Sorry!', 'Thanks!', 'Negative.', 'Roger that.')
     fRadioUsrSelector = ui.new_combobox('lua', 'B', 'Who get "banned"?', 'Self', unpack(names))
     itemTypeSelector =
         ui.new_combobox('lua', 'B', 'Ban type', 'Cooldown30Min', 'Cooldown24Hrs', 'Cooldown7Day', 'VACban')
@@ -287,7 +287,7 @@ local function mode_FakeUnbox()
     refreshUI()
     ui.set_visible(fRadioModeSelector, true)
     rRadioSelector =
-        ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheers!', 'Sorry!', 'Thanks!', 'Negative.', 'Roger.')
+        ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheer!', 'Sorry!', 'Thanks!', 'Negative.', 'Roger that.')
     fRadioUsrSelector = ui.new_combobox('lua', 'B', 'Who will have this?', 'Self', unpack(names))
     itemTypeSelector = ui.new_combobox('lua', 'B', 'Ways to Obtain?', 'Unbox', 'Transaction', 'Gift')
     itemGradeSelector =
@@ -312,7 +312,7 @@ local function mode_FakeMessage()
     refreshUI()
     ui.set_visible(fRadioModeSelector, true)
     rRadioSelector =
-        ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheers!', 'Sorry!', 'Thanks!', 'Negative.', 'Roger.')
+        ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheer!', 'Sorry!', 'Thanks!', 'Negative.', 'Roger that.')
     ui.set_visible(fRadioUsrSelector, true)
     ui.set_visible(customMsgLabel, true)
     ui.set_visible(itemNameInput, true)
@@ -350,7 +350,7 @@ local function mode_Misc()
     refreshUI()
     ui.set_visible(fRadioModeSelector, true)
     rRadioSelector =
-        ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheers!', 'Sorry!', 'Thanks!', 'Negative.', 'Roger.')
+        ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheer!', 'Sorry!', 'Thanks!', 'Negative.', 'Roger that.')
     itemGradeSelector = ui.new_combobox('lua', 'B', 'Misc function', 'Fake commend', 'gamesense')
     ui.set_visible(proceedButton, true)
 end
