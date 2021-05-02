@@ -23,20 +23,29 @@ Create a empty file in VSCode and use Ctrl+F to search for the following SFUI co
 Copy all text corresponding to the following SFUI code into the new file you just created.
 
 **SFUI_Radio_Cheer**
+
 **SFUI_Radio_Sorry**
+
 **SFUI_Radio_Thanks**
+
 **SFUI_Radio_Negative**
+
 **SFUI_Radio_Roger**
 
 **Cstrike_Chat_AllDead**
 
 **Item_FoundInCrate**
+
 **Item_Traded**
+
 **Item_Gifted**
 
 **SFUI_Notice_Player_AbandonedCooldown_Min**
+
 **SFUI_Notice_Player_AbandonedCooldown_Hrs**
+
 **SFUI_Notice_Player_AbandonedCooldown_Days**
+
 **SFUI_Notice_Player_PermanentCooldown**
 
 **SFUI_Notice_Commend_Player_YouGotNewCommendation**
