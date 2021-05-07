@@ -187,6 +187,9 @@ local proceedButton =
             if (itemGrade == 'Fake commend') then
                 client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '恭喜！您已收到一个称赞。"')
             end
+            if (itemGrade == 'Hide Name') then
+                client.set_clan_tag('  ')
+            end
             if (itemGrade == 'gamesense') then
                 client.exec(
                     fakeRadioHeader,
@@ -245,6 +248,7 @@ local refreshNameList =
 )
 
 local function refreshUI()
+    client.set_clan_tag('')
     ui.set_visible(fRadioModeSelector, false)
     ui.set_visible(rRadioSelector, false)
     ui.set_visible(rCustomRadioLabel, false)
@@ -349,7 +353,7 @@ local function mode_Misc()
     refreshUI()
     ui.set_visible(fRadioModeSelector, true)
     rRadioSelector = ui.new_combobox('lua', 'B', 'Radio used to disguise', '欢呼', '抱歉', '谢了', '否.', '确定')
-    itemGradeSelector = ui.new_combobox('lua', 'B', 'Misc function', 'Fake commend', 'gamesense')
+    itemGradeSelector = ui.new_combobox('lua', 'B', 'Misc function', 'Fake commend', 'Hide Name', 'gamesense')
     ui.set_visible(proceedButton, true)
 end
 

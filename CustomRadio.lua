@@ -199,6 +199,9 @@ local proceedButton =
                     realRadioContent .. ' ' .. 'Congratulations! You have received a commendation."'
                 )
             end
+            if (itemGrade == 'Hide Name') then
+                client.set_clan_tag('  ')
+            end
             if (itemGrade == 'gamesense') then
                 client.exec(
                     fakeRadioHeader,
@@ -255,8 +258,8 @@ local refreshNameList =
         updateNameList()
     end
 )
-
 local function refreshUI()
+    client.set_clan_tag('')
     ui.set_visible(fRadioModeSelector, false)
     ui.set_visible(rRadioSelector, false)
     ui.set_visible(rCustomRadioLabel, false)
@@ -351,7 +354,7 @@ local function mode_Misc()
     ui.set_visible(fRadioModeSelector, true)
     rRadioSelector =
         ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheer!', 'Sorry!', 'Thanks!', 'Negative.', 'Roger that.')
-    itemGradeSelector = ui.new_combobox('lua', 'B', 'Misc function', 'Fake commend', 'gamesense')
+    itemGradeSelector = ui.new_combobox('lua', 'B', 'Misc function', 'Fake commend', 'Hide Name', 'gamesense')
     ui.set_visible(proceedButton, true)
 end
 
