@@ -1,4 +1,4 @@
-# FireBird Paste 2021( CustomRadio.lua )
+# FireBird Paste 2021 (CustomRadio.lua)
 Tag: **Funny**, **Trolling**
 ## What is this
 This is a Lua that makes you can fake other player in your team and you can disguising other to do some funny stuff.
