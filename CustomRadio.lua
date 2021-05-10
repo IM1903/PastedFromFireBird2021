@@ -5,6 +5,8 @@ local fakeRadioUser
 local itemType
 local itemGrade
 local itemName
+local itemName_Pre
+local itemNameOpt
 local names = {}
 local old_size = #names
 local localPlayer
@@ -42,8 +44,18 @@ local itemGradeSelector =
     'Contraband'
 )
 local itemNameLabel = ui.new_label('lua', 'B', 'Item name?')
+itemNameOpt = ui.new_multiselect('lua', 'B', 'Skin option', '★', 'StatTrak™')
 local customMsgLabel = ui.new_label('lua', 'B', 'Message content')
 local itemNameInput = ui.new_textbox('lua', 'B', 'Item name')
+
+local function contains(table, val)
+    for i = 1, #table do
+        if table[i] == val then
+            return true
+        end
+    end
+    return false
+end
 
 local proceedButton =
     ui.new_button(
@@ -87,9 +99,21 @@ local proceedButton =
             elseif (itemGrade == 'Contraband') then
                 itemGrade = ''
             end
+            local itemNameOpt_table = ui.get(itemNameOpt)
+            if (contains(itemNameOpt_table, '★')) then
+                itemName_Pre = '★ '
+                if (contains(itemNameOpt_table, '★') and contains(itemNameOpt_table, 'StatTrak™')) then
+                    itemName_Pre = '★ StatTrak™ '
+                end
+            elseif (contains(itemNameOpt_table, 'StatTrak™')) then
+                itemName_Pre = 'StatTrak™ '
+            else
+                itemName_Pre = ''
+            end
             client.exec(
                 fakeRadioHeader,
-                realRadioContent .. ' ' .. fakeRadioUser .. '' .. itemType .. itemGrade .. itemName .. '"'
+                realRadioContent ..
+                    ' ' .. fakeRadioUser .. '' .. itemType .. itemGrade .. itemName_Pre .. itemName .. '"'
             )
         elseif (usingMode == 'Fake ban') then
             realRadioContent = ui.get(rRadioSelector)
@@ -272,6 +296,7 @@ local function refreshUI()
     ui.set_visible(itemNameInput, false)
     ui.set_visible(refreshNameList, false)
     ui.set_visible(proceedButton, false)
+    ui.set_visible(itemNameOpt, false)
 end
 
 local function mode_FakeBan()
@@ -307,6 +332,7 @@ local function mode_FakeUnbox()
     )
     itemNameLabel = ui.new_label('lua', 'B', 'Item name?')
     itemNameInput = ui.new_textbox('lua', 'B', 'Item name')
+    itemNameOpt = ui.new_multiselect('lua', 'B', 'Skin option', '★', 'StatTrak™')
     ui.set_visible(refreshNameList, true)
     ui.set_visible(proceedButton, true)
 end
