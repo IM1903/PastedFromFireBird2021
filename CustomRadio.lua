@@ -13,36 +13,16 @@ local localPlayer
 local enabled
 
 local useIt = ui.new_checkbox('lua', 'B', 'Fake radio/ message/ unbox meme')
-local fRadioModeSelector =
-    ui.new_combobox(
-    'lua',
-    'B',
-    'What you wanna do?',
-    '-',
-    'Fake message',
-    'Fake unbox',
-    'Fake ban',
-    'Custom radio',
-    'Misc stuff'
-)
-local rRadioSelector =
-    ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheer!', 'Sorry!', 'Thanks!', 'Negative.', 'Roger that.')
+local fRadioModeSelector = ui.new_combobox('lua', 'B', 'What you wanna do?', '-', 'Fake message', 'Fake radio',
+                               'Fake unbox', 'Fake ban', 'Custom radio', 'Misc stuff')
+local rRadioSelector = ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheer!', 'Sorry!', 'Thanks!', 'Negative.',
+                           'Roger that.')
 local rCustomRadioLabel = ui.new_label('lua', 'B', 'Custom radio')
 local rCustomRadioInput = ui.new_textbox('lua', 'B', 'Custom radio content')
 local fRadioUsrSelector = ui.new_combobox('lua', 'B', 'Who will *say* this?', 'Self', unpack(names))
 local itemTypeSelector = ui.new_combobox('lua', 'B', 'Ways to Obtain?', 'Unbox', 'Transaction', 'Gift')
-local itemGradeSelector =
-    ui.new_combobox(
-    'lua',
-    'B',
-    'Item grade?',
-    'Consumer',
-    'Industrial',
-    'Mil-spec',
-    'Classified',
-    'Extraordinary',
-    'Contraband'
-)
+local itemGradeSelector = ui.new_combobox('lua', 'B', 'Item grade?', 'Consumer', 'Industrial', 'Mil-spec', 'Classified',
+                              'Extraordinary', 'Contraband')
 local itemNameLabel = ui.new_label('lua', 'B', 'Item name?')
 itemNameOpt = ui.new_multiselect('lua', 'B', 'Skin option', '★', 'StatTrak™')
 local customMsgLabel = ui.new_label('lua', 'B', 'Message content')
@@ -57,184 +37,165 @@ local function contains(table, val)
     return false
 end
 
-local proceedButton =
-    ui.new_button(
-    'lua',
-    'B',
-    'Lets Go',
-    function()
-        if (usingMode == 'Fake unbox') then
-            realRadioContent = ui.get(rRadioSelector)
-            fakeRadioUser = ui.get(fRadioUsrSelector)
-            itemType = ui.get(itemTypeSelector)
-            itemGrade = ui.get(itemGradeSelector)
-            itemName = ui.get(itemNameInput)
+local proceedButton = ui.new_button('lua', 'B', 'Lets Go', function()
+    if (usingMode == 'Fake unbox') then
+        realRadioContent = ui.get(rRadioSelector)
+        fakeRadioUser = ui.get(fRadioUsrSelector)
+        itemType = ui.get(itemTypeSelector)
+        itemGrade = ui.get(itemGradeSelector)
+        itemName = ui.get(itemNameInput)
 
-            if (fakeRadioUser == 'Self') then
-                localPlayer = entity.get_local_player()
-                local localName = entity.get_player_name(localPlayer)
+        if (fakeRadioUser == 'Self') then
+            localPlayer = entity.get_local_player()
+            local localName = entity.get_player_name(localPlayer)
+            fakeRadioUser = localName
+        else
+            fakeRadioUser = fakeRadioUser
+        end
+
+        if (itemType == 'Unbox') then
+            itemType = ' has opened a container and found: '
+        elseif (itemType == 'Transaction') then
+            itemType = ' has received in trade: '
+        elseif (itemType == 'Gift') then
+            itemType = ' has accepted a gift: '
+        end
+
+        if (itemGrade == 'Consumer') then
+            itemGrade = ''
+        elseif (itemGrade == 'Industrial') then
+            itemGrade = ''
+        elseif (itemGrade == 'Mil-spec') then
+            itemGrade = ''
+        elseif (itemGrade == 'Classified') then
+            itemGrade = ''
+        elseif (itemGrade == 'Extraordinary') then
+            itemGrade = ''
+        elseif (itemGrade == 'Contraband') then
+            itemGrade = ''
+        end
+        local itemNameOpt_table = ui.get(itemNameOpt)
+        if (contains(itemNameOpt_table, '★')) then
+            itemName_Pre = '★ '
+            if (contains(itemNameOpt_table, '★') and contains(itemNameOpt_table, 'StatTrak™')) then
+                itemName_Pre = '★ StatTrak™ '
+            end
+        elseif (contains(itemNameOpt_table, 'StatTrak™')) then
+            itemName_Pre = 'StatTrak™ '
+        else
+            itemName_Pre = ''
+        end
+        client.exec(fakeRadioHeader, realRadioContent .. ' ' .. fakeRadioUser .. '' .. itemType .. itemGrade ..
+            itemName_Pre .. itemName .. '"')
+    elseif (usingMode == 'Fake ban') then
+        realRadioContent = ui.get(rRadioSelector)
+        fakeRadioUser = ui.get(fRadioUsrSelector)
+        itemType = ui.get(itemTypeSelector)
+        itemName = ui.get(itemNameInput)
+
+        if (fakeRadioUser == 'Self') then
+            localPlayer = entity.get_local_player()
+            local localName = entity.get_player_name(localPlayer)
+            fakeRadioUser = localName
+        else
+            fakeRadioUser = fakeRadioUser
+        end
+
+        if (itemType == 'Cooldown30Min') then
+            client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '' .. fakeRadioUser ..
+                ' abandoned the match and received a 30 minutes cooldown.')
+        elseif (itemType == 'Cooldown24Hrs') then
+            client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '' .. fakeRadioUser ..
+                ' abandoned the match and received a 24 hours cooldown.')
+        elseif (itemType == 'Cooldown7Day') then
+            client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '' .. fakeRadioUser ..
+                ' abandoned the match and received a 7 days cooldown.')
+        elseif (itemType == 'VACban') then
+            client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '' .. fakeRadioUser ..
+                ' has been permanently banned from official CS:GO servers.' .. '"')
+        end
+    elseif (usingMode == 'Fake message') then
+        fakeRadioMode = ui.get(fRadioModeSelector)
+        realRadioContent = ui.get(rRadioSelector)
+        fakeRadioUser = ui.get(fRadioUsrSelector)
+        itemName = ui.get(itemNameInput)
+
+        if (fakeRadioUser == 'Self') then
+            localPlayer = entity.get_local_player()
+            local localName = entity.get_player_name(localPlayer)
+            if entity.is_alive(localPlayer) then
                 fakeRadioUser = localName
             else
-                fakeRadioUser = fakeRadioUser
+                fakeRadioUser = '*DEAD* ' .. localName
             end
-
-            if (itemType == 'Unbox') then
-                itemType = ' has opened a container and found: '
-            elseif (itemType == 'Transaction') then
-                itemType = ' has received in trade: '
-            elseif (itemType == 'Gift') then
-                itemType = ' has accepted a gift: '
-            end
-
-            if (itemGrade == 'Consumer') then
-                itemGrade = ''
-            elseif (itemGrade == 'Industrial') then
-                itemGrade = ''
-            elseif (itemGrade == 'Mil-spec') then
-                itemGrade = ''
-            elseif (itemGrade == 'Classified') then
-                itemGrade = ''
-            elseif (itemGrade == 'Extraordinary') then
-                itemGrade = ''
-            elseif (itemGrade == 'Contraband') then
-                itemGrade = ''
-            end
-            local itemNameOpt_table = ui.get(itemNameOpt)
-            if (contains(itemNameOpt_table, '★')) then
-                itemName_Pre = '★ '
-                if (contains(itemNameOpt_table, '★') and contains(itemNameOpt_table, 'StatTrak™')) then
-                    itemName_Pre = '★ StatTrak™ '
-                end
-            elseif (contains(itemNameOpt_table, 'StatTrak™')) then
-                itemName_Pre = 'StatTrak™ '
-            else
-                itemName_Pre = ''
-            end
-            client.exec(
-                fakeRadioHeader,
-                realRadioContent ..
-                    ' ' .. fakeRadioUser .. '' .. itemType .. itemGrade .. itemName_Pre .. itemName .. '"'
-            )
-        elseif (usingMode == 'Fake ban') then
-            realRadioContent = ui.get(rRadioSelector)
-            fakeRadioUser = ui.get(fRadioUsrSelector)
-            itemType = ui.get(itemTypeSelector)
-            itemName = ui.get(itemNameInput)
-
-            if (fakeRadioUser == 'Self') then
-                localPlayer = entity.get_local_player()
-                local localName = entity.get_player_name(localPlayer)
-                fakeRadioUser = localName
-            else
-                fakeRadioUser = fakeRadioUser
-            end
-
-            if (itemType == 'Cooldown30Min') then
-                client.exec(
-                    fakeRadioHeader,
-                    realRadioContent ..
-                        ' ' .. '' .. fakeRadioUser .. ' abandoned the match and received a 30 minutes cooldown.'
-                )
-            elseif (itemType == 'Cooldown24Hrs') then
-                client.exec(
-                    fakeRadioHeader,
-                    realRadioContent ..
-                        ' ' .. '' .. fakeRadioUser .. ' abandoned the match and received a 24 hours cooldown.'
-                )
-            elseif (itemType == 'Cooldown7Day') then
-                client.exec(
-                    fakeRadioHeader,
-                    realRadioContent ..
-                        ' ' .. '' .. fakeRadioUser .. ' abandoned the match and received a 7 days cooldown.'
-                )
-            elseif (itemType == 'VACban') then
-                client.exec(
-                    fakeRadioHeader,
-                    realRadioContent ..
-                        ' ' ..
-                            '' .. fakeRadioUser .. ' has been permanently banned from official CS:GO servers.' .. '"'
-                )
-            end
-        elseif (usingMode == 'Fake message') then
-            fakeRadioMode = ui.get(fRadioModeSelector)
-            realRadioContent = ui.get(rRadioSelector)
-            fakeRadioUser = ui.get(fRadioUsrSelector)
-            itemName = ui.get(itemNameInput)
-
-            if (fakeRadioUser == 'Self') then
-                localPlayer = entity.get_local_player()
-                local localName = entity.get_player_name(localPlayer)
-                if entity.is_alive(localPlayer) then
-                    fakeRadioUser = localName
-                else
-                    fakeRadioUser = '*DEAD* ' .. localName
-                end
-            else
-                fakeRadioUser = fakeRadioUser
-                for i = globals.maxplayers(), 1, -1 do
-                    i = math.floor(i)
-                    local name = entity.get_player_name(i)
-                    if (name ~= 'unknown' and i ~= localPlayer) then
-                        if (fakeRadioUser == name and entity.is_alive(i)) then
-                            fakeRadioUser = fakeRadioUser
-                        end
-                        if (fakeRadioUser == name and not entity.is_alive(i)) then
-                            fakeRadioUser = '*DEAD* ' .. fakeRadioUser
-                        end
+        else
+            fakeRadioUser = fakeRadioUser
+            for i = globals.maxplayers(), 1, -1 do
+                i = math.floor(i)
+                local name = entity.get_player_name(i)
+                if (name ~= 'unknown' and i ~= localPlayer) then
+                    if (fakeRadioUser == name and entity.is_alive(i)) then
+                        fakeRadioUser = fakeRadioUser
+                    end
+                    if (fakeRadioUser == name and not entity.is_alive(i)) then
+                        fakeRadioUser = '*DEAD* ' .. fakeRadioUser
                     end
                 end
             end
-            client.exec(fakeRadioHeader, realRadioContent .. ' ' .. fakeRadioUser .. ' : ' .. itemName .. '"')
-        elseif (usingMode == 'Custom radio') then
-            local msgColor = ui.get(rRadioSelector)
-            if (msgColor == 'Normal') then
-                msgColor = ''
-            elseif (msgColor == 'White') then
-                msgColor = ''
-            elseif (msgColor == 'Grey') then
-                msgColor = ''
-            elseif (msgColor == 'Green') then
-                msgColor = ''
-            elseif (msgColor == 'Chartreuse Green') then
-                msgColor = ''
-            elseif (msgColor == 'Spring Green') then
-                msgColor = ''
-            elseif (msgColor == 'Light blue') then
-                msgColor = ''
-            elseif (msgColor == 'Darker blue') then
-                msgColor = ''
-            elseif (msgColor == 'Pinkish purple') then
-                msgColor = ''
-            elseif (msgColor == 'Red') then
-                msgColor = ''
-            elseif (msgColor == 'Crimson') then
-                msgColor = ''
-            elseif (msgColor == 'Gold') then
-                msgColor = ''
-            end
-            itemName = ui.get(itemNameInput)
-            client.exec(fakeRadioHeader, msgColor .. itemName .. '"')
-        elseif (usingMode == 'Misc stuff') then
-            realRadioContent = ui.get(rRadioSelector)
-            itemGrade = ui.get(itemGradeSelector)
-            if (itemGrade == 'Fake commend') then
-                client.exec(
-                    fakeRadioHeader,
-                    realRadioContent .. ' ' .. 'Congratulations! You have received a commendation."'
-                )
-            end
-            if (itemGrade == 'Hide Name') then
-                client.set_clan_tag('  ')
-            end
-            if (itemGrade == 'gamesense') then
-                client.exec(
-                    fakeRadioHeader,
-                    realRadioContent .. '  ' .. '     Powered by ' .. '' .. 'game' .. '' .. 'sense' .. '     "'
-                )
-            end
+        end
+        client.exec(fakeRadioHeader, realRadioContent .. ' ' .. fakeRadioUser .. ' : ' .. itemName .. '"')
+    elseif (usingMode == 'Fake radio') then
+        realRadioContent = ui.get(rRadioSelector)
+        fakeRadioUser = ui.get(fRadioUsrSelector)
+        itemName = ui.get(itemNameInput)
+        itemType = ui.get(rCustomRadioInput)
+        client.exec(fakeRadioHeader,
+            realRadioContent .. '   ' .. fakeRadioUser .. ' @ ' .. itemName .. ' (RADIO): ' .. itemType)
+    elseif (usingMode == 'Custom radio') then
+        local msgColor = ui.get(rRadioSelector)
+        if (msgColor == 'Normal') then
+            msgColor = ''
+        elseif (msgColor == 'White') then
+            msgColor = ''
+        elseif (msgColor == 'Grey') then
+            msgColor = ''
+        elseif (msgColor == 'Green') then
+            msgColor = ''
+        elseif (msgColor == 'Chartreuse Green') then
+            msgColor = ''
+        elseif (msgColor == 'Spring Green') then
+            msgColor = ''
+        elseif (msgColor == 'Light blue') then
+            msgColor = ''
+        elseif (msgColor == 'Darker blue') then
+            msgColor = ''
+        elseif (msgColor == 'Pinkish purple') then
+            msgColor = ''
+        elseif (msgColor == 'Red') then
+            msgColor = ''
+        elseif (msgColor == 'Crimson') then
+            msgColor = ''
+        elseif (msgColor == 'Gold') then
+            msgColor = ''
+        end
+        itemName = ui.get(itemNameInput)
+        client.exec(fakeRadioHeader, msgColor .. itemName .. '"')
+    elseif (usingMode == 'Misc stuff') then
+        realRadioContent = ui.get(rRadioSelector)
+        itemGrade = ui.get(itemGradeSelector)
+        if (itemGrade == 'Fake commend') then
+            client.exec(fakeRadioHeader,
+                realRadioContent .. ' ' .. 'Congratulations! You have received a commendation."')
+        end
+        if (itemGrade == 'Hide Name') then
+            client.set_clan_tag('  ')
+        end
+        if (itemGrade == 'gamesense') then
+            client.exec(fakeRadioHeader, realRadioContent .. '  ' .. '     Powered by ' .. '' .. 'game' .. '' ..
+                'sense' .. '     "')
         end
     end
-)
+end)
 
 local function updateNames()
     local ret = {}
@@ -258,6 +219,8 @@ local function updateNameList()
             fRadioUsrSelector = ui.new_combobox('lua', 'B', 'Who will have this?', 'Self', unpack(names))
         elseif (ui.get(fRadioModeSelector) == 'Fake ban') then
             fRadioUsrSelector = ui.new_combobox('lua', 'B', 'Who get "banned"?', 'Self', unpack(names))
+        elseif (ui.get(fRadioModeSelector) == 'Fake radio') then
+            fRadioUsrSelector = ui.new_combobox('lua', 'B', 'Who will send radio', 'Self', unpack(names))
         end
         old_size = #names
         enabled = ui.get(useIt)
@@ -272,16 +235,10 @@ local function updateNameList()
     end
 end
 
-local refreshNameList =
-    ui.new_button(
-    'lua',
-    'B',
-    'Refresh name list',
-    function()
-        updateNames()
-        updateNameList()
-    end
-)
+local refreshNameList = ui.new_button('lua', 'B', 'Refresh name list', function()
+    updateNames()
+    updateNameList()
+end)
 local function refreshUI()
     client.set_clan_tag('')
     ui.set_visible(fRadioModeSelector, false)
@@ -302,11 +259,11 @@ end
 local function mode_FakeBan()
     refreshUI()
     ui.set_visible(fRadioModeSelector, true)
-    rRadioSelector =
-        ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheer!', 'Sorry!', 'Thanks!', 'Negative.', 'Roger that.')
+    rRadioSelector = ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheer!', 'Sorry!', 'Thanks!', 'Negative.',
+                         'Roger that.')
     fRadioUsrSelector = ui.new_combobox('lua', 'B', 'Who get "banned"?', 'Self', unpack(names))
-    itemTypeSelector =
-        ui.new_combobox('lua', 'B', 'Ban type', 'Cooldown30Min', 'Cooldown24Hrs', 'Cooldown7Day', 'VACban')
+    itemTypeSelector = ui.new_combobox('lua', 'B', 'Ban type', 'Cooldown30Min', 'Cooldown24Hrs', 'Cooldown7Day',
+                           'VACban')
     ui.set_visible(refreshNameList, true)
     ui.set_visible(proceedButton, true)
 end
@@ -314,22 +271,12 @@ end
 local function mode_FakeUnbox()
     refreshUI()
     ui.set_visible(fRadioModeSelector, true)
-    rRadioSelector =
-        ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheer!', 'Sorry!', 'Thanks!', 'Negative.', 'Roger that.')
+    rRadioSelector = ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheer!', 'Sorry!', 'Thanks!', 'Negative.',
+                         'Roger that.')
     fRadioUsrSelector = ui.new_combobox('lua', 'B', 'Who will have this?', 'Self', unpack(names))
     itemTypeSelector = ui.new_combobox('lua', 'B', 'Ways to Obtain?', 'Unbox', 'Transaction', 'Gift')
-    itemGradeSelector =
-        ui.new_combobox(
-        'lua',
-        'B',
-        'Item grade?',
-        'Consumer',
-        'Industrial',
-        'Mil-spec',
-        'Classified',
-        'Extraordinary',
-        'Contraband'
-    )
+    itemGradeSelector = ui.new_combobox('lua', 'B', 'Item grade?', 'Consumer', 'Industrial', 'Mil-spec', 'Classified',
+                            'Extraordinary', 'Contraband')
     itemNameLabel = ui.new_label('lua', 'B', 'Item name?')
     itemNameInput = ui.new_textbox('lua', 'B', 'Item name')
     itemNameOpt = ui.new_multiselect('lua', 'B', 'Skin option', '★', 'StatTrak™')
@@ -340,11 +287,25 @@ end
 local function mode_FakeMessage()
     refreshUI()
     ui.set_visible(fRadioModeSelector, true)
-    rRadioSelector =
-        ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheer!', 'Sorry!', 'Thanks!', 'Negative.', 'Roger that.')
+    rRadioSelector = ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheer!', 'Sorry!', 'Thanks!', 'Negative.',
+                         'Roger that.')
     ui.set_visible(fRadioUsrSelector, true)
     ui.set_visible(customMsgLabel, true)
     ui.set_visible(itemNameInput, true)
+    ui.set_visible(refreshNameList, true)
+    ui.set_visible(proceedButton, true)
+end
+
+local function mode_FakeRadio()
+    refreshUI()
+    ui.set_visible(fRadioModeSelector, true)
+    rRadioSelector = ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheer!', 'Sorry!', 'Thanks!', 'Negative.',
+                         'Roger that.')
+    fRadioUsrSelector = ui.new_combobox('lua', 'B', 'Who will send radio', 'Self', unpack(names))
+    customMsgLabel = ui.new_label('lua', 'B', 'Location')
+    itemNameInput = ui.new_textbox('lua', 'B', 'Location input')
+    rCustomRadioLabel = ui.new_label('lua', 'B', 'Radio content')
+    rCustomRadioInput = ui.new_textbox('lua', 'B', 'Radio input')
     ui.set_visible(refreshNameList, true)
     ui.set_visible(proceedButton, true)
 end
@@ -354,32 +315,17 @@ local function mode_CustomRadio()
     ui.set_visible(fRadioModeSelector, true)
     customMsgLabel = ui.new_label('lua', 'B', 'Advanced Radio:')
     itemNameInput = ui.new_textbox('lua', 'B', 'Radio content')
-    rRadioSelector =
-        ui.new_combobox(
-        'lua',
-        'B',
-        'Message color',
-        'Normal',
-        'White',
-        'Grey',
-        'Green',
-        'Chartreuse Green',
-        'Spring Green',
-        'Light blue',
-        'Darker blue',
-        'Pinkish purple',
-        'Red',
-        'Crimson',
-        'Gold'
-    )
+    rRadioSelector = ui.new_combobox('lua', 'B', 'Message color', 'Normal', 'White', 'Grey', 'Green',
+                         'Chartreuse Green', 'Spring Green', 'Light blue', 'Darker blue', 'Pinkish purple', 'Red',
+                         'Crimson', 'Gold')
     ui.set_visible(proceedButton, enabled)
 end
 
 local function mode_Misc()
     refreshUI()
     ui.set_visible(fRadioModeSelector, true)
-    rRadioSelector =
-        ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheer!', 'Sorry!', 'Thanks!', 'Negative.', 'Roger that.')
+    rRadioSelector = ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheer!', 'Sorry!', 'Thanks!', 'Negative.',
+                         'Roger that.')
     itemGradeSelector = ui.new_combobox('lua', 'B', 'Misc function', 'Fake commend', 'Hide Name', 'gamesense')
     ui.set_visible(proceedButton, true)
 end
@@ -395,6 +341,8 @@ local function handleMenu(...)
             mode_FakeBan()
         elseif (usingMode == 'Fake message') then
             mode_FakeMessage()
+        elseif (usingMode == 'Fake radio') then
+            mode_FakeRadio()
         elseif (usingMode == 'Custom radio') then
             mode_CustomRadio()
         elseif (usingMode == 'Misc stuff') then
