@@ -19,12 +19,32 @@ local fRadioModeSelector = ui.new_combobox('lua', 'B', 'What you wanna do?', '-'
     'Fake unbox', 'Fake ban', 'Custom radio', 'Misc stuff')
 local rRadioSelector = ui.new_combobox('lua', 'B', 'Radio used to disguise', 'Cheer!', 'Sorry!', 'Thanks!', 'Negative.',
     'Roger that.')
+
+local function rRadioHeader()
+    local fakeHeader = ui.get(rRadioSelector)
+    if (fakeHeader == 'Cheer!') then
+        fakeRadioHeader = 'playerradio Radio.Cheer "'
+    end
+    if (fakeHeader == 'Sorry!') then
+        fakeRadioHeader = 'playerchatwheel . "'
+    end
+    if (fakeHeader == 'Thanks!') then
+        fakeRadioHeader = 'playerradio Radio.Thanks "'
+    end
+    if (fakeHeader == 'Negative.') then
+        fakeRadioHeader = 'playerradio Radio.Negative "'
+    end
+    if (fakeHeader == 'Roger that.') then
+        fakeRadioHeader = 'playerradio Radio.Roger "'
+    end
+end
+
 local rCustomRadioLabel = ui.new_label('lua', 'B', 'Custom radio')
 local rCustomRadioInput = ui.new_textbox('lua', 'B', 'Custom radio content')
 local fRadioUsrSelector = ui.new_combobox('lua', 'B', 'Who will *say* this?', 'Self', unpack(names))
 local itemTypeSelector = ui.new_combobox('lua', 'B', 'Ways to Obtain?', 'Unbox', 'Transaction', 'Gift')
 local itemGradeSelector = ui.new_combobox('lua', 'B', 'Item grade?', 'Consumer', 'Industrial', 'Mil-spec', 'Classified',
-    'Extraordinary', 'Contraband')
+    'Restricted', 'Extraordinary', 'Contraband')
 local itemNameLabel = ui.new_label('lua', 'B', 'Item name?')
 itemNameOpt = ui.new_multiselect('lua', 'B', 'Skin option', '★', 'StatTrak™')
 local customMsgLabel = ui.new_label('lua', 'B', 'Message content')
@@ -46,6 +66,7 @@ end
 local proceedButton = ui.new_button('lua', 'B', 'Lets Go', function()
     localPlayer = entity.get_local_player()
     if (localPlayer ~= nil) then
+        rRadioHeader()
         if (usingMode == 'Fake unbox') then
             realRadioContent = ui.get(rRadioSelector)
             fakeRadioUser = ui.get(fRadioUsrSelector)
@@ -75,6 +96,8 @@ local proceedButton = ui.new_button('lua', 'B', 'Lets Go', function()
                 itemGrade = ''
             elseif (itemGrade == 'Mil-spec') then
                 itemGrade = ''
+            elseif (itemGrade == 'Restricted') then
+                itemGrade = ' '
             elseif (itemGrade == 'Classified') then
                 itemGrade = ''
             elseif (itemGrade == 'Extraordinary') then
@@ -157,10 +180,12 @@ local proceedButton = ui.new_button('lua', 'B', 'Lets Go', function()
             fakeRadioUser = ui.get(fRadioUsrSelector)
             itemName = ui.get(itemNameInput)
             itemType = ui.get(rCustomRadioInput)
+
             client.exec(fakeRadioHeader, realRadioContent .. '   ' .. fakeRadioUser .. ' @ ' .. itemName ..
                 ' (RADIO): ' .. itemType)
         elseif (usingMode == 'Custom radio') then
             local msgColor = ui.get(rRadioSelector)
+            fakeRadioHeader = 'playerchatwheel . "'
             if (msgColor == 'Normal') then
                 msgColor = ''
             elseif (msgColor == 'White') then
@@ -191,6 +216,7 @@ local proceedButton = ui.new_button('lua', 'B', 'Lets Go', function()
         elseif (usingMode == 'Misc stuff') then
             realRadioContent = ui.get(rRadioSelector)
             itemGrade = ui.get(itemGradeSelector)
+
             if (itemGrade == 'Fake commend') then
                 client.exec(fakeRadioHeader,
                     realRadioContent .. ' ' .. 'Congratulations! You have received a commendation."')
@@ -286,8 +312,8 @@ local function mode_FakeUnbox()
         'Roger that.')
     fRadioUsrSelector = ui.new_combobox('lua', 'B', 'Who will have this?', 'Self', unpack(names))
     itemTypeSelector = ui.new_combobox('lua', 'B', 'Ways to Obtain?', 'Unbox', 'Transaction', 'Gift')
-    itemGradeSelector = ui.new_combobox('lua', 'B', 'Item grade?', 'Consumer', 'Industrial', 'Mil-spec', 'Classified',
-        'Extraordinary', 'Contraband')
+    itemGradeSelector = ui.new_combobox('lua', 'B', 'Item grade?', 'Consumer', 'Industrial', 'Mil-spec', 'Restricted',
+        'Classified', 'Extraordinary', 'Contraband')
     itemNameLabel = ui.new_label('lua', 'B', 'Item name?')
     itemNameInput = ui.new_textbox('lua', 'B', 'Item name')
     itemNameOpt = ui.new_multiselect('lua', 'B', 'Skin option', '★', 'StatTrak™')

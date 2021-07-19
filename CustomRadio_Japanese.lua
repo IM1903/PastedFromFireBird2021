@@ -17,6 +17,26 @@ local fRadioModeSelector = ui.new_combobox('lua', 'B', 'What you wanna do?', '-'
     'Fake ban', 'Custom radio', 'Misc stuff')
 local rRadioSelector = ui.new_combobox('lua', 'B', 'Radio used to disguise', 'やった！', '行け',
     'ありがとう', '拒否する', '了解')
+
+local function rRadioHeader()
+    local fakeHeader = ui.get(rRadioSelector)
+    if (fakeHeader == 'やった！') then
+        fakeRadioHeader = 'playerradio Radio.Cheer "'
+    end
+    if (fakeHeader == '行け') then
+        fakeRadioHeader = 'playerradio Radio.Go "'
+    end
+    if (fakeHeader == 'ありがとう') then
+        fakeRadioHeader = 'playerradio Radio.Thanks "'
+    end
+    if (fakeHeader == '拒否する') then
+        fakeRadioHeader = 'playerradio Radio.Negative "'
+    end
+    if (fakeHeader == '了解') then
+        fakeRadioHeader = 'playerradio Radio.Roger "'
+    end
+end
+
 local rCustomRadioLabel = ui.new_label('lua', 'B', 'Custom radio')
 local rCustomRadioInput = ui.new_textbox('lua', 'B', 'Custom radio content')
 local fRadioUsrSelector = ui.new_combobox('lua', 'B', 'Who will *say* this?', 'Self', unpack(names))
@@ -32,144 +52,150 @@ local function isChangingCfg()
 end
 
 local proceedButton = ui.new_button('lua', 'B', 'Lets Go', function()
-    if (usingMode == 'Fake unbox') then
-        realRadioContent = ui.get(rRadioSelector)
-        fakeRadioUser = ui.get(fRadioUsrSelector)
-        itemType = ui.get(itemTypeSelector)
-        itemGrade = ui.get(itemGradeSelector)
-        itemName = ui.get(itemNameInput)
+    localPlayer = entity.get_local_player()
+    if (localPlayer ~= nil) then
+        rRadioHeader()
+        if (usingMode == 'Fake unbox') then
+            realRadioContent = ui.get(rRadioSelector)
+            fakeRadioUser = ui.get(fRadioUsrSelector)
+            itemType = ui.get(itemTypeSelector)
+            itemGrade = ui.get(itemGradeSelector)
+            itemName = ui.get(itemNameInput)
 
-        if (fakeRadioUser == 'Self') then
-            localPlayer = entity.get_local_player()
-            local localName = entity.get_player_name(localPlayer)
-            fakeRadioUser = localName
-        else
-            fakeRadioUser = fakeRadioUser
-        end
-
-        if (itemGrade == 'Consumer') then
-            itemGrade = ''
-        elseif (itemGrade == 'Industrial') then
-            itemGrade = ''
-        elseif (itemGrade == 'Mil-spec') then
-            itemGrade = ''
-        elseif (itemGrade == 'Classified') then
-            itemGrade = ''
-        elseif (itemGrade == 'Extraordinary') then
-            itemGrade = ''
-        elseif (itemGrade == 'Contraband') then
-            itemGrade = ''
-        end
-
-        if (itemType == 'Unbox') then
-            itemType = ' がコンテナを開き、 ' .. itemGrade .. itemName .. ' を見つけました'
-        elseif (itemType == 'Transaction') then
-            itemType = ' が ' .. itemGrade .. itemName .. ' をトレードで入手しました'
-        elseif (itemType == 'Gift') then
-            itemType = ' がギフトとして' .. itemGrade .. itemName .. ' を受け取りました'
-        end
-
-        client.exec(fakeRadioHeader, realRadioContent .. ' ' .. fakeRadioUser .. '' .. itemType .. '"')
-    elseif (usingMode == 'Fake ban') then
-        realRadioContent = ui.get(rRadioSelector)
-        fakeRadioUser = ui.get(fRadioUsrSelector)
-        itemType = ui.get(itemTypeSelector)
-        itemName = ui.get(itemNameInput)
-
-        if (fakeRadioUser == 'Self') then
-            localPlayer = entity.get_local_player()
-            local localName = entity.get_player_name(localPlayer)
-            fakeRadioUser = localName
-        else
-            fakeRadioUser = fakeRadioUser
-        end
-
-        if (itemType == 'Cooldown30Min') then
-            client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '' .. fakeRadioUser ..
-                ' がマッチを放棄したため、マッチメイキングクールダウン30分が適用されました。')
-        elseif (itemType == 'Cooldown24Hrs') then
-            client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '' .. fakeRadioUser ..
-                ' がマッチを放棄したため、対戦マッチメイキングクールダウン24時間が適用されました。')
-        elseif (itemType == 'Cooldown7Day') then
-            client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '' .. fakeRadioUser ..
-                ' がマッチを放棄し、対戦マッチメイキングクールダウン7日が適用されました。')
-        elseif (itemType == 'VACban') then
-            client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '' .. fakeRadioUser ..
-                ' は公式 CS:GO サーバーから永久的に追放されました。' .. '"')
-        end
-    elseif (usingMode == 'Fake message') then
-        fakeRadioMode = ui.get(fRadioModeSelector)
-        realRadioContent = ui.get(rRadioSelector)
-        fakeRadioUser = ui.get(fRadioUsrSelector)
-        itemName = ui.get(itemNameInput)
-
-        if (fakeRadioUser == 'Self') then
-            localPlayer = entity.get_local_player()
-            local localName = entity.get_player_name(localPlayer)
-            if entity.is_alive(localPlayer) then
+            if (fakeRadioUser == 'Self') then
+                localPlayer = entity.get_local_player()
+                local localName = entity.get_player_name(localPlayer)
                 fakeRadioUser = localName
             else
-                fakeRadioUser = '*死亡* ' .. localName
+                fakeRadioUser = fakeRadioUser
             end
-        else
-            fakeRadioUser = fakeRadioUser
-            for i = globals.maxplayers(), 1, -1 do
-                i = math.floor(i)
-                local name = entity.get_player_name(i)
-                if (name ~= 'unknown' and i ~= localPlayer) then
-                    if (fakeRadioUser == name and entity.is_alive(i)) then
-                        fakeRadioUser = fakeRadioUser
-                    end
-                    if (fakeRadioUser == name and not entity.is_alive(i)) then
-                        fakeRadioUser = '*死亡* ' .. fakeRadioUser
+
+            if (itemGrade == 'Consumer') then
+                itemGrade = ''
+            elseif (itemGrade == 'Industrial') then
+                itemGrade = ''
+            elseif (itemGrade == 'Mil-spec') then
+                itemGrade = ''
+            elseif (itemGrade == 'Classified') then
+                itemGrade = ''
+            elseif (itemGrade == 'Extraordinary') then
+                itemGrade = ''
+            elseif (itemGrade == 'Contraband') then
+                itemGrade = ''
+            end
+
+            if (itemType == 'Unbox') then
+                itemType = ' がコンテナを開き、 ' .. itemGrade .. itemName .. ' を見つけました'
+            elseif (itemType == 'Transaction') then
+                itemType = ' が ' .. itemGrade .. itemName .. ' をトレードで入手しました'
+            elseif (itemType == 'Gift') then
+                itemType = ' がギフトとして' .. itemGrade .. itemName .. ' を受け取りました'
+            end
+
+            client.exec(fakeRadioHeader, realRadioContent .. ' ' .. fakeRadioUser .. '' .. itemType .. '"')
+        elseif (usingMode == 'Fake ban') then
+            realRadioContent = ui.get(rRadioSelector)
+            fakeRadioUser = ui.get(fRadioUsrSelector)
+            itemType = ui.get(itemTypeSelector)
+            itemName = ui.get(itemNameInput)
+
+            if (fakeRadioUser == 'Self') then
+                localPlayer = entity.get_local_player()
+                local localName = entity.get_player_name(localPlayer)
+                fakeRadioUser = localName
+            else
+                fakeRadioUser = fakeRadioUser
+            end
+
+            if (itemType == 'Cooldown30Min') then
+                client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '' .. fakeRadioUser ..
+                    ' がマッチを放棄したため、マッチメイキングクールダウン30分が適用されました。')
+            elseif (itemType == 'Cooldown24Hrs') then
+                client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '' .. fakeRadioUser ..
+                    ' がマッチを放棄したため、対戦マッチメイキングクールダウン24時間が適用されました。')
+            elseif (itemType == 'Cooldown7Day') then
+                client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '' .. fakeRadioUser ..
+                    ' がマッチを放棄し、対戦マッチメイキングクールダウン7日が適用されました。')
+            elseif (itemType == 'VACban') then
+                client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '' .. fakeRadioUser ..
+                    ' は公式 CS:GO サーバーから永久的に追放されました。' .. '"')
+            end
+        elseif (usingMode == 'Fake message') then
+            fakeRadioMode = ui.get(fRadioModeSelector)
+            realRadioContent = ui.get(rRadioSelector)
+            fakeRadioUser = ui.get(fRadioUsrSelector)
+            itemName = ui.get(itemNameInput)
+
+            if (fakeRadioUser == 'Self') then
+                localPlayer = entity.get_local_player()
+                local localName = entity.get_player_name(localPlayer)
+                if entity.is_alive(localPlayer) then
+                    fakeRadioUser = localName
+                else
+                    fakeRadioUser = '*死亡* ' .. localName
+                end
+            else
+                fakeRadioUser = fakeRadioUser
+                for i = globals.maxplayers(), 1, -1 do
+                    i = math.floor(i)
+                    local name = entity.get_player_name(i)
+                    if (name ~= 'unknown' and i ~= localPlayer) then
+                        if (fakeRadioUser == name and entity.is_alive(i)) then
+                            fakeRadioUser = fakeRadioUser
+                        end
+                        if (fakeRadioUser == name and not entity.is_alive(i)) then
+                            fakeRadioUser = '*死亡* ' .. fakeRadioUser
+                        end
                     end
                 end
             end
+            client.exec(fakeRadioHeader, realRadioContent .. ' ' .. fakeRadioUser .. ' : ' .. itemName .. '"')
+        elseif (usingMode == 'Custom radio') then
+            fakeRadioHeader = 'playerchatwheel . "'
+            local msgColor = ui.get(rRadioSelector)
+            if (msgColor == 'Normal') then
+                msgColor = ''
+            elseif (msgColor == 'White') then
+                msgColor = ''
+            elseif (msgColor == 'Grey') then
+                msgColor = ''
+            elseif (msgColor == 'Green') then
+                msgColor = ''
+            elseif (msgColor == 'Chartreuse Green') then
+                msgColor = ''
+            elseif (msgColor == 'Spring Green') then
+                msgColor = ''
+            elseif (msgColor == 'Light blue') then
+                msgColor = ''
+            elseif (msgColor == 'Darker blue') then
+                msgColor = ''
+            elseif (msgColor == 'Pinkish purple') then
+                msgColor = ''
+            elseif (msgColor == 'Red') then
+                msgColor = ''
+            elseif (msgColor == 'Crimson') then
+                msgColor = ''
+            elseif (msgColor == 'Gold') then
+                msgColor = ''
+            end
+            itemName = ui.get(itemNameInput)
+            client.exec(fakeRadioHeader, msgColor .. itemName .. '"')
+        elseif (usingMode == 'Misc stuff') then
+            realRadioContent = ui.get(rRadioSelector)
+            itemGrade = ui.get(itemGradeSelector)
+            if (itemGrade == 'Fake commend') then
+                client.exec(fakeRadioHeader, realRadioContent .. ' ' ..
+                    'おめでとう! あなたは称賛受け取りました。"')
+            end
+            if (itemGrade == 'Hide Name') then
+                client.set_clan_tag('  ')
+            end
+            if (itemGrade == 'gamesense') then
+                client.exec(fakeRadioHeader,
+                    realRadioContent .. '  ' .. '     Powered by ' .. '' .. 'game' .. '' .. 'sense' .. '     "')
+            end
         end
-        client.exec(fakeRadioHeader, realRadioContent .. ' ' .. fakeRadioUser .. ' : ' .. itemName .. '"')
-    elseif (usingMode == 'Custom radio') then
-        local msgColor = ui.get(rRadioSelector)
-        if (msgColor == 'Normal') then
-            msgColor = ''
-        elseif (msgColor == 'White') then
-            msgColor = ''
-        elseif (msgColor == 'Grey') then
-            msgColor = ''
-        elseif (msgColor == 'Green') then
-            msgColor = ''
-        elseif (msgColor == 'Chartreuse Green') then
-            msgColor = ''
-        elseif (msgColor == 'Spring Green') then
-            msgColor = ''
-        elseif (msgColor == 'Light blue') then
-            msgColor = ''
-        elseif (msgColor == 'Darker blue') then
-            msgColor = ''
-        elseif (msgColor == 'Pinkish purple') then
-            msgColor = ''
-        elseif (msgColor == 'Red') then
-            msgColor = ''
-        elseif (msgColor == 'Crimson') then
-            msgColor = ''
-        elseif (msgColor == 'Gold') then
-            msgColor = ''
-        end
-        itemName = ui.get(itemNameInput)
-        client.exec(fakeRadioHeader, msgColor .. itemName .. '"')
-    elseif (usingMode == 'Misc stuff') then
-        realRadioContent = ui.get(rRadioSelector)
-        itemGrade = ui.get(itemGradeSelector)
-        if (itemGrade == 'Fake commend') then
-            client.exec(fakeRadioHeader,
-                realRadioContent .. ' ' .. 'おめでとう! あなたは称賛受け取りました。"')
-        end
-        if (itemGrade == 'Hide Name') then
-            client.set_clan_tag('  ')
-        end
-        if (itemGrade == 'gamesense') then
-            client.exec(fakeRadioHeader, realRadioContent .. '  ' .. '     Powered by ' .. '' .. 'game' .. '' ..
-                'sense' .. '     "')
-        end
+        return
     end
 end)
 

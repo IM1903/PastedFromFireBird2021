@@ -16,7 +16,27 @@ local useIt = ui.new_checkbox('lua', 'B', 'Fake radio/ message/ unbox meme')
 local fRadioModeSelector = ui.new_combobox('lua', 'B', 'What you wanna do?', '-', 'Fake message', 'Fake unbox',
     'Fake ban', 'Custom radio', 'Misc stuff')
 local rRadioSelector = ui.new_combobox('lua', 'B', 'Radio used to disguise', '欢呼！', '抱歉!', '谢了！',
-    '拒绝。', 'Custom')
+    '拒绝。', '收到。')
+
+local function rRadioHeader()
+    local fakeHeader = ui.get(rRadioSelector)
+    if (fakeHeader == '欢呼！') then
+        fakeRadioHeader = 'playerradio Radio.Cheer "'
+    end
+    if (fakeHeader == '抱歉!') then
+        fakeRadioHeader = 'playerchatwheel . "'
+    end
+    if (fakeHeader == '谢了！') then
+        fakeRadioHeader = 'playerradio Radio.Thanks "'
+    end
+    if (fakeHeader == '拒绝。') then
+        fakeRadioHeader = 'playerradio Radio.Negative "'
+    end
+    if (fakeHeader == '收到。') then
+        fakeRadioHeader = 'playerradio Radio.Roger "'
+    end
+end
+
 local rCustomRadioLabel = ui.new_label('lua', 'B', 'Custom radio')
 local rCustomRadioInput = ui.new_textbox('lua', 'B', 'Custom radio content')
 local fRadioUsrSelector = ui.new_combobox('lua', 'B', 'Who will *say* this?', 'Self', unpack(names))
@@ -32,143 +52,149 @@ local function isChangingCfg()
 end
 
 local proceedButton = ui.new_button('lua', 'B', 'Lets Go', function()
-    if (usingMode == 'Fake unbox') then
-        realRadioContent = ui.get(rRadioSelector)
-        fakeRadioUser = ui.get(fRadioUsrSelector)
-        itemType = ui.get(itemTypeSelector)
-        itemGrade = ui.get(itemGradeSelector)
-        itemName = ui.get(itemNameInput)
+    localPlayer = entity.get_local_player()
+    if (localPlayer ~= nil) then
+        rRadioHeader()
+        if (usingMode == 'Fake unbox') then
+            realRadioContent = ui.get(rRadioSelector)
+            fakeRadioUser = ui.get(fRadioUsrSelector)
+            itemType = ui.get(itemTypeSelector)
+            itemGrade = ui.get(itemGradeSelector)
+            itemName = ui.get(itemNameInput)
 
-        if (fakeRadioUser == 'Self') then
-            localPlayer = entity.get_local_player()
-            local localName = entity.get_player_name(localPlayer)
-            fakeRadioUser = localName
-        else
-            fakeRadioUser = fakeRadioUser
-        end
-
-        if (itemType == 'Unbox') then
-            itemType = ' 从武器箱中获得了：'
-        elseif (itemType == 'Transaction') then
-            itemType = ' 通过交易获得了：'
-        elseif (itemType == 'Gift') then
-            itemType = ' 接受了—份礼物：'
-        end
-
-        if (itemGrade == 'Consumer') then
-            itemGrade = ''
-        elseif (itemGrade == 'Industrial') then
-            itemGrade = ''
-        elseif (itemGrade == 'Mil-spec') then
-            itemGrade = ''
-        elseif (itemGrade == 'Classified') then
-            itemGrade = ''
-        elseif (itemGrade == 'Extraordinary') then
-            itemGrade = ''
-        elseif (itemGrade == 'Contraband') then
-            itemGrade = ''
-        end
-        client.exec(fakeRadioHeader,
-            realRadioContent .. ' ' .. fakeRadioUser .. '' .. itemType .. itemGrade .. itemName .. '"')
-    elseif (usingMode == 'Fake ban') then
-        realRadioContent = ui.get(rRadioSelector)
-        fakeRadioUser = ui.get(fRadioUsrSelector)
-        itemType = ui.get(itemTypeSelector)
-        itemName = ui.get(itemNameInput)
-
-        if (fakeRadioUser == 'Self') then
-            localPlayer = entity.get_local_player()
-            local localName = entity.get_player_name(localPlayer)
-            fakeRadioUser = localName
-        else
-            fakeRadioUser = fakeRadioUser
-        end
-
-        if (itemType == 'Cooldown30Min') then
-            client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '' .. fakeRadioUser ..
-                ' 放弃了比赛，获得30分钟竞技匹配冷却时间。')
-        elseif (itemType == 'Cooldown24Hrs') then
-            client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '' .. fakeRadioUser ..
-                ' 放弃了比赛，获得24小时竞技匹配冷却时间。')
-        elseif (itemType == 'Cooldown7Day') then
-            client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '' .. fakeRadioUser ..
-                ' 放弃了比赛，获得7天竞技匹配冷却时间。')
-        elseif (itemType == 'VACban') then
-            client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '' .. fakeRadioUser ..
-                ' 已经被CS:GO服务器永久封禁。' .. '"')
-        end
-    elseif (usingMode == 'Fake message') then
-        fakeRadioMode = ui.get(fRadioModeSelector)
-        realRadioContent = ui.get(rRadioSelector)
-        fakeRadioUser = ui.get(fRadioUsrSelector)
-        itemName = ui.get(itemNameInput)
-
-        if (fakeRadioUser == 'Self') then
-            localPlayer = entity.get_local_player()
-            local localName = entity.get_player_name(localPlayer)
-            if entity.is_alive(localPlayer) then
+            if (fakeRadioUser == 'Self') then
+                localPlayer = entity.get_local_player()
+                local localName = entity.get_player_name(localPlayer)
                 fakeRadioUser = localName
             else
-                fakeRadioUser = '*死亡* ' .. localName
+                fakeRadioUser = fakeRadioUser
             end
-        else
-            fakeRadioUser = fakeRadioUser
-            for i = globals.maxplayers(), 1, -1 do
-                i = math.floor(i)
-                local name = entity.get_player_name(i)
-                if (name ~= 'unknown' and i ~= localPlayer) then
-                    if (fakeRadioUser == name and entity.is_alive(i)) then
-                        fakeRadioUser = fakeRadioUser
-                    end
-                    if (fakeRadioUser == name and not entity.is_alive(i)) then
-                        fakeRadioUser = '*死亡* ' .. fakeRadioUser
+
+            if (itemType == 'Unbox') then
+                itemType = ' 从武器箱中获得了：'
+            elseif (itemType == 'Transaction') then
+                itemType = ' 通过交易获得了：'
+            elseif (itemType == 'Gift') then
+                itemType = ' 接受了—份礼物：'
+            end
+
+            if (itemGrade == 'Consumer') then
+                itemGrade = ''
+            elseif (itemGrade == 'Industrial') then
+                itemGrade = ''
+            elseif (itemGrade == 'Mil-spec') then
+                itemGrade = ''
+            elseif (itemGrade == 'Classified') then
+                itemGrade = ''
+            elseif (itemGrade == 'Extraordinary') then
+                itemGrade = ''
+            elseif (itemGrade == 'Contraband') then
+                itemGrade = ''
+            end
+            client.exec(fakeRadioHeader,
+                realRadioContent .. ' ' .. fakeRadioUser .. '' .. itemType .. itemGrade .. itemName .. '"')
+        elseif (usingMode == 'Fake ban') then
+            realRadioContent = ui.get(rRadioSelector)
+            fakeRadioUser = ui.get(fRadioUsrSelector)
+            itemType = ui.get(itemTypeSelector)
+            itemName = ui.get(itemNameInput)
+
+            if (fakeRadioUser == 'Self') then
+                localPlayer = entity.get_local_player()
+                local localName = entity.get_player_name(localPlayer)
+                fakeRadioUser = localName
+            else
+                fakeRadioUser = fakeRadioUser
+            end
+
+            if (itemType == 'Cooldown30Min') then
+                client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '' .. fakeRadioUser ..
+                    ' 放弃了比赛，获得30分钟竞技匹配冷却时间。')
+            elseif (itemType == 'Cooldown24Hrs') then
+                client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '' .. fakeRadioUser ..
+                    ' 放弃了比赛，获得24小时竞技匹配冷却时间。')
+            elseif (itemType == 'Cooldown7Day') then
+                client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '' .. fakeRadioUser ..
+                    ' 放弃了比赛，获得7天竞技匹配冷却时间。')
+            elseif (itemType == 'VACban') then
+                client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '' .. fakeRadioUser ..
+                    ' 已经被CS:GO服务器永久封禁。' .. '"')
+            end
+        elseif (usingMode == 'Fake message') then
+            fakeRadioMode = ui.get(fRadioModeSelector)
+            realRadioContent = ui.get(rRadioSelector)
+            fakeRadioUser = ui.get(fRadioUsrSelector)
+            itemName = ui.get(itemNameInput)
+
+            if (fakeRadioUser == 'Self') then
+                localPlayer = entity.get_local_player()
+                local localName = entity.get_player_name(localPlayer)
+                if entity.is_alive(localPlayer) then
+                    fakeRadioUser = localName
+                else
+                    fakeRadioUser = '*死亡* ' .. localName
+                end
+            else
+                fakeRadioUser = fakeRadioUser
+                for i = globals.maxplayers(), 1, -1 do
+                    i = math.floor(i)
+                    local name = entity.get_player_name(i)
+                    if (name ~= 'unknown' and i ~= localPlayer) then
+                        if (fakeRadioUser == name and entity.is_alive(i)) then
+                            fakeRadioUser = fakeRadioUser
+                        end
+                        if (fakeRadioUser == name and not entity.is_alive(i)) then
+                            fakeRadioUser = '*死亡* ' .. fakeRadioUser
+                        end
                     end
                 end
             end
+            client.exec(fakeRadioHeader, realRadioContent .. ' ' .. fakeRadioUser .. ' : ' .. itemName .. '"')
+        elseif (usingMode == 'Custom radio') then
+            fakeRadioHeader = 'playerchatwheel . "'
+            local msgColor = ui.get(rRadioSelector)
+            if (msgColor == 'Normal') then
+                msgColor = ''
+            elseif (msgColor == 'White') then
+                msgColor = ''
+            elseif (msgColor == 'Grey') then
+                msgColor = ''
+            elseif (msgColor == 'Green') then
+                msgColor = ''
+            elseif (msgColor == 'Chartreuse Green') then
+                msgColor = ''
+            elseif (msgColor == 'Spring Green') then
+                msgColor = ''
+            elseif (msgColor == 'Light blue') then
+                msgColor = ''
+            elseif (msgColor == 'Darker blue') then
+                msgColor = ''
+            elseif (msgColor == 'Pinkish purple') then
+                msgColor = ''
+            elseif (msgColor == 'Red') then
+                msgColor = ''
+            elseif (msgColor == 'Crimson') then
+                msgColor = ''
+            elseif (msgColor == 'Gold') then
+                msgColor = ''
+            end
+            itemName = ui.get(itemNameInput)
+            client.exec(fakeRadioHeader, msgColor .. itemName .. '"')
+        elseif (usingMode == 'Misc stuff') then
+            realRadioContent = ui.get(rRadioSelector)
+            itemGrade = ui.get(itemGradeSelector)
+            if (itemGrade == 'Fake commend') then
+                client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '恭喜！您已收到一个称赞。"')
+            end
+            if (itemGrade == 'Hide Name') then
+                client.set_clan_tag('  ')
+            end
+            if (itemGrade == 'gamesense') then
+                client.exec(fakeRadioHeader,
+                    realRadioContent .. '  ' .. '     Powered by ' .. '' .. 'game' .. '' .. 'sense' .. '     "')
+            end
         end
-        client.exec(fakeRadioHeader, realRadioContent .. ' ' .. fakeRadioUser .. ' : ' .. itemName .. '"')
-    elseif (usingMode == 'Custom radio') then
-        local msgColor = ui.get(rRadioSelector)
-        if (msgColor == 'Normal') then
-            msgColor = ''
-        elseif (msgColor == 'White') then
-            msgColor = ''
-        elseif (msgColor == 'Grey') then
-            msgColor = ''
-        elseif (msgColor == 'Green') then
-            msgColor = ''
-        elseif (msgColor == 'Chartreuse Green') then
-            msgColor = ''
-        elseif (msgColor == 'Spring Green') then
-            msgColor = ''
-        elseif (msgColor == 'Light blue') then
-            msgColor = ''
-        elseif (msgColor == 'Darker blue') then
-            msgColor = ''
-        elseif (msgColor == 'Pinkish purple') then
-            msgColor = ''
-        elseif (msgColor == 'Red') then
-            msgColor = ''
-        elseif (msgColor == 'Crimson') then
-            msgColor = ''
-        elseif (msgColor == 'Gold') then
-            msgColor = ''
-        end
-        itemName = ui.get(itemNameInput)
-        client.exec(fakeRadioHeader, msgColor .. itemName .. '"')
-    elseif (usingMode == 'Misc stuff') then
-        realRadioContent = ui.get(rRadioSelector)
-        itemGrade = ui.get(itemGradeSelector)
-        if (itemGrade == 'Fake commend') then
-            client.exec(fakeRadioHeader, realRadioContent .. ' ' .. '恭喜！您已收到一个称赞。"')
-        end
-        if (itemGrade == 'Hide Name') then
-            client.set_clan_tag('  ')
-        end
-        if (itemGrade == 'gamesense') then
-            client.exec(fakeRadioHeader, realRadioContent .. '  ' .. '     Powered by ' .. '' .. 'game' .. '' ..
-                'sense' .. '     "')
-        end
+        return
     end
 end)
 
